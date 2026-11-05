@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>🌾 Fattoria 3D</title>
+<link rel="apple-touch-icon" href="icona.png">
+<link rel="icon" type="image/png" href="icona.png">
+<!-- Anteprima per i social e WhatsApp -->
+<meta property="og:title" content="🌾 Fattoria 3D">
+<meta property="og:description" content="Coltiva, alleva animali e diventa un contadino ricco!">
+<meta property="og:image" content="icona.png">
+<meta property="og:type" content="website">
+
+<!-- Icona per la scheda del browser -->
+<link rel="icon" type="image/png" href="icona.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- HUD -->
+  <div id="hud">
+    <div class="chip">🌾 <span id="wheat">0</span></div>
+    <div class="chip">🌽 <span id="corn">0</span></div>
+    <div class="chip">🥕 <span id="carrot">0</span></div>
+    <div class="chip">🥚 <span id="eggs">0</span></div>
+    <div class="chip">🥩 <span id="meat">0</span></div>
+    <div class="chip">💰 <span id="money">20</span></div>
+    <div class="chip">💧 <span id="water">10</span></div>
+  </div>
+
+  <div id="info">Zappa il terreno per iniziare ⛏️</div>
+  <div id="crosshair"></div>
+  <div id="flash"></div>
+  <div id="saveIndicator">💾 Salvato</div>
+  <div id="feedPrompt">🍽️ Tocca USA per nutrire</div>
+
+  <div id="gearBtn">⚙️</div>
+  <div id="joy"><div id="stick"></div></div>
+  <button id="actionBtn">USA</button>
+
+  <!-- Toolbar -->
+  <div id="toolbar">
+    <div class="tool active" data-tool="hoe" title="Zappa">⛏️</div>
+    <div class="tool" data-tool="seed" title="Semina">
+      <span id="seedIcon">🌾</span>
+    </div>
+    <div class="tool" data-tool="water" title="Annaffia">💧</div>
+    <div class="tool" data-tool="harvest" title="Raccogli">🧺</div>
+    <div class="tool" data-tool="feed" title="Nutri animali">🍽️</div>
+  </div>
+
+  <!-- Pannello selezione semi -->
+  <div id="seedPanel">
+    <div class="seedCard selected" data-seed="wheat">
+      <div class="seedIcon">🌾</div>
+      <div class="seedName">Grano</div>
+      <div class="seedCost free">Gratis</div>
+      <div class="seedInfo">8s · vende 8💰</div>
+    </div>
+    <div class="seedCard" data-seed="corn">
+      <div class="seedIcon">🌽</div>
+      <div class="seedName">Mais</div>
+      <div class="seedCost">10💰</div>
+      <div class="seedInfo">15s · vende 25💰</div>
+    </div>
+    <div class="seedCard" data-seed="carrot">
+      <div class="seedIcon">🥕</div>
+      <div class="seedName">Carota</div>
+      <div class="seedCost">20💰</div>
+      <div class="seedInfo">25s · vende 60💰</div>
+    </div>
+  </div>
+
+  <!-- Impostazioni -->
+  <div id="settings">
+    <div id="settingsPanel">
+      <h2>⚙️ Impostazioni</h2>
+      <div class="setting">
+        <label>Sensibilità camera <span id="sensVal">100%</span></label>
+        <input type="range" id="sensSlider" min="20" max="300" value="100" step="10">
+      </div>
+      <div class="setting">
+        <label>Dimensione joystick <span id="joyVal">112px</span></label>
+        <input type="range" id="joySlider" min="80" max="200" value="112" step="4">
+        <div class="previewJoy" id="previewJoy"></div>
+      </div>
+      <button id="closeSettings">Chiudi</button>
+      <button id="resetSave">🗑️ Cancella partita salvata</button>
+    </div>
+  </div>
+
+  <!-- Mercato -->
+  <div id="marketUI">
+    <div id="marketPanel">
+      <h2>🏪 Mercato</h2>
+      <div class="subtitle">Scegli cosa vendere</div>
+      <div id="marketProducts"></div>
+      <div id="marketTotal">
+        <span>Totale:</span>
+        <strong><span id="totalEarn">0</span>💰</strong>
+      </div>
+      <div class="marketButtons">
+        <button id="cancelSale">Annulla</button>
+        <button id="confirmSale" disabled>Vendi tutto</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="error"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

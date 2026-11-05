@@ -1,0 +1,610 @@
+/* =====================================================
+   RESET E BASE
+   ===================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  background: #87CEEB;
+}
+
+canvas { display: block; touch-action: none; }
+
+/* =====================================================
+   HUD
+   ===================================================== */
+#hud {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  pointer-events: none;
+  font-weight: bold;
+  font-size: 13px;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  z-index: 10;
+  max-width: calc(100% - 60px);
+}
+
+#hud .chip {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+#info {
+  position: fixed;
+  top: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  padding: 7px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  text-align: center;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 10;
+  max-width: 80%;
+  transition: opacity 0.4s;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 5;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6), inset 0 0 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s, border-color 0.1s;
+}
+
+#crosshair.target {
+  transform: scale(1.6);
+  border-color: #FFD700;
+}
+
+#flash {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 8;
+  transition: opacity 0.15s;
+}
+
+#saveIndicator {
+  position: fixed;
+  top: 10px;
+  right: 64px;
+  background: rgba(76, 175, 80, 0.9);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: bold;
+  z-index: 50;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+#feedPrompt {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, 60px);
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: bold;
+  z-index: 15;
+  pointer-events: none;
+  display: none;
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from { transform: translate(-50%, 60px) scale(1); }
+  to   { transform: translate(-50%, 60px) scale(1.05); }
+}
+
+/* =====================================================
+   TOOLBAR
+   ===================================================== */
+#toolbar {
+  position: fixed;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 20;
+  background: rgba(30, 25, 20, 0.6);
+  padding: 7px;
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.tool {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid transparent;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tool.active {
+  background: linear-gradient(135deg, #66BB6A, #43A047);
+  border-color: #fff;
+  box-shadow: 0 0 14px rgba(102, 187, 106, 0.7);
+  transform: scale(1.1);
+}
+
+.tool:active { transform: scale(0.92); }
+
+/* =====================================================
+   SEED PANEL
+   ===================================================== */
+#seedPanel {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  gap: 10px;
+  z-index: 30;
+  padding: 12px;
+  background: rgba(20, 20, 20, 0.85);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  max-width: calc(100% - 20px);
+  overflow-x: auto;
+}
+
+#seedPanel.open { display: flex; }
+
+.seedCard {
+  min-width: 90px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: #fff;
+}
+
+.seedCard:active { transform: scale(0.95); }
+
+.seedCard.selected {
+  background: linear-gradient(135deg, #66BB6A, #43A047);
+  border-color: #fff;
+  box-shadow: 0 0 14px rgba(102, 187, 106, 0.7);
+}
+
+.seedCard.unaffordable {
+  opacity: 0.4;
+}
+
+.seedIcon { font-size: 28px; margin-bottom: 4px; }
+
+.seedName { font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+
+.seedCost {
+  font-size: 12px;
+  color: #FFD700;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.seedCost.free { color: #66BB6A; }
+
+.seedInfo {
+  font-size: 10px;
+  color: #bbb;
+}
+
+/* =====================================================
+   PULSANTE AZIONE
+   ===================================================== */
+#actionBtn {
+  position: fixed;
+  bottom: 100px;
+  right: 14px;
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  color: #fff;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), inset 0 2px 8px rgba(255, 255, 255, 0.3);
+  z-index: 20;
+  touch-action: none;
+  transition: transform 0.1s, background 0.2s;
+}
+
+#actionBtn:active { transform: scale(0.9); }
+
+/* =====================================================
+   JOYSTICK
+   ===================================================== */
+#joy {
+  position: fixed;
+  bottom: 76px;
+  left: 14px;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  touch-action: none;
+  z-index: 20;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.15);
+  transition: width 0.2s, height 0.2s;
+}
+
+#stick {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35), inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.08s ease-out;
+  will-change: transform;
+}
+
+/* =====================================================
+   GEAR BUTTON
+   ===================================================== */
+#gearBtn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  font-size: 22px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+#gearBtn:active { transform: scale(0.92) rotate(45deg); }
+
+/* =====================================================
+   IMPOSTAZIONI
+   ===================================================== */
+#settings {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+#settings.open { display: flex; }
+
+#settingsPanel {
+  background: #2b2b2b;
+  color: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+#settingsPanel h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.setting { margin-bottom: 22px; }
+
+.setting label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #ddd;
+}
+
+.setting label span:last-child {
+  color: #66BB6A;
+  font-weight: bold;
+}
+
+.setting input[type="range"] {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #444;
+  border-radius: 3px;
+  outline: none;
+}
+
+.setting input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #66BB6A;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.previewJoy {
+  margin: 12px auto;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.2s, height 0.2s;
+}
+
+.previewJoy::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #ddd);
+  transform: translate(-50%, -50%);
+}
+
+#closeSettings {
+  width: 100%;
+  padding: 14px;
+  margin-top: 8px;
+  background: linear-gradient(135deg, #66BB6A, #43A047);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#resetSave {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  background: rgba(244, 67, 54, 0.8);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* =====================================================
+   MERCATO
+   ===================================================== */
+#marketUI {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+#marketUI.open { display: flex; }
+
+#marketPanel {
+  background: linear-gradient(180deg, #3a2a1a, #2b1f10);
+  color: #fff;
+  border-radius: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  border: 2px solid #C8A94D;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+#marketPanel h2 {
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 6px;
+  color: #FFD700;
+}
+
+#marketPanel .subtitle {
+  text-align: center;
+  font-size: 13px;
+  color: #bbb;
+  margin-bottom: 20px;
+}
+
+.product {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product .icon { font-size: 34px; flex-shrink: 0; }
+
+.product .info { flex: 1; }
+
+.product .name { font-size: 15px; font-weight: bold; }
+
+.product .price { font-size: 12px; color: #FFD700; }
+
+.product .qty { font-size: 13px; color: #bbb; margin-top: 2px; }
+
+.product .controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.product .controls button {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.product .controls button:active { transform: scale(0.9); }
+
+.product .count {
+  min-width: 36px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.sellAllBtn {
+  background: linear-gradient(135deg, #66BB6A, #43A047);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: bold;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+#marketTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+#marketTotal strong { color: #FFD700; font-size: 20px; }
+
+.marketButtons {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.marketButtons button {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#cancelSale {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+#confirmSale {
+  background: linear-gradient(135deg, #66BB6A, #43A047);
+  color: #fff;
+}
+
+#confirmSale:disabled {
+  background: #555;
+  color: #999;
+  cursor: not-allowed;
+}
+
+#error {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #c00;
+  color: #fff;
+  padding: 20px;
+  font-size: 12px;
+  display: none;
+  z-index: 1000;
+  white-space: pre-wrap;
+  font-family: monospace;
+  overflow: auto;
+}
